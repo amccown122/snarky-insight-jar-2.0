@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply antialiased bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950;
+}
+
+.focus-ring:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-offset-neutral-900 ring-brand-400;
+}
+
+/* Jar mask utility */
+.jar-mask {
+  -webkit-mask-image: url('/assets/jar-mask2.png');
+  mask-image: url('/assets/jar-mask2.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+/* Visually hidden, but accessible */
+.sr-only-focusable:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0.5rem !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
