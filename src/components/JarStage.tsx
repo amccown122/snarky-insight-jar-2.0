@@ -6,10 +6,10 @@ import Coin from './Coin'
 // Interior bounds of the jar in percentages relative to stage.
 // Initial fit; we will fine-tune after live check.
 const JAR_INSET = {
-  left: 0.290,   // +1% left
-  right: 0.710,  // -1% right
+  left: 0.290,   // unchanged horizontally
+  right: 0.710,
   top: 0.215,    // unchanged
-  bottom: 0.785, // lowered ~2%
+  bottom: 0.765, // raise bottom by 2%
 }
 
 const MIN_SIZE_PCT = 0.052 // ~5.2% of stage width
@@ -55,7 +55,7 @@ export const JarStage: React.FC<Props> = ({ className }) => {
     <div className={className}>
       <div
         ref={stageRef}
-        className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,rgba(28,29,31,0.92),rgba(13,14,16,0.94))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_16px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10"
+        className="jar-card relative aspect-[4/5] w-full overflow-hidden rounded-[28px] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_16px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10"
         aria-label="Jar stage"
       >
         {/* Back layer: jar interior */}

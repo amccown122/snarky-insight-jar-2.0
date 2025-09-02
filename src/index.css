@@ -23,6 +23,14 @@ body {
   @apply outline-none ring-2 ring-offset-2 ring-offset-neutral-900 ring-brand-400;
 }
 
+/* Jar stage card background */
+.jar-card {
+  background:
+    radial-gradient(700px 500px at 38% 28%, rgba(255,255,255,0.07), rgba(255,255,255,0) 58%),
+    radial-gradient(800px 600px at 80% 80%, rgba(255,255,255,0.035), rgba(255,255,255,0) 60%),
+    linear-gradient(145deg, rgba(28,29,31,0.95), rgba(10,11,12,0.94));
+}
+
 /* Jar mask utility */
 .jar-mask {
   -webkit-mask-image: url('/assets/jar-mask2.png');
