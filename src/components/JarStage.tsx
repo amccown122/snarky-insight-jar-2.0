@@ -3,17 +3,17 @@ import { motion } from 'framer-motion'
 import { useJarStore } from '../state/useJarStore'
 import Coin from './Coin'
 
-// Interior bounds of the jar in percentages relative to stage
-// Tuned to align with jar-inside2.png and jar-mask2.png assuming similar aspect
+// Interior bounds of the jar in percentages relative to stage.
+// Initial fit; we will fine-tune after live check.
 const JAR_INSET = {
-  left: 0.24,
-  right: 0.76,
-  top: 0.10,
-  bottom: 0.88,
+  left: 0.265,   // narrowed ~5% from left
+  right: 0.735,  // narrowed ~5% from right
+  top: 0.215,    // moved down ~5%
+  bottom: 0.815, // pulled up ~10%
 }
 
 const MIN_SIZE_PCT = 0.052 // ~5.2% of stage width
-const MAX_SIZE_PCT = 0.064
+const MAX_SIZE_PCT = 0.060
 
 type Props = {
   className?: string
@@ -55,22 +55,26 @@ export const JarStage: React.FC<Props> = ({ className }) => {
     <div className={className}>
       <div
         ref={stageRef}
-        className="relative aspect-[4/5] w-full overflow-visible rounded-3xl bg-gradient-to-br from-neutral-800/40 to-neutral-900/60 p-4 shadow-inner ring-1 ring-white/10"
+        className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,rgba(28,29,31,0.92),rgba(13,14,16,0.94))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_16px_40px_rgba(0,0,0,0.45)] ring-1 ring-white/10"
         aria-label="Jar stage"
       >
         {/* Back layer: jar interior */}
         <img src="/assets/jar-inside2.png" alt="Jar" className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain" />
 
         {/* Coins masked to jar */}
-        <div className="pointer-events-none absolute inset-0 jar-mask">
+        <div className="pointer-events-none absolute inset-0 jar-mask overflow-hidden">
           {coins.map(({ entry, layout }) => {
             if (!layout || stageW === 0) return null
             const insideW = (JAR_INSET.right - JAR_INSET.left) * stageW
             const insideH = (JAR_INSET.bottom - JAR_INSET.top) * stageH
-            const x = JAR_INSET.left * stageW + layout.xPct * insideW
+            // Clamp layout to interior in case of window resizes
+            const margin = 0.02
+            const clampedXPct = clamp(layout.xPct, 0 + layout.sizePct / 2 + margin, 1 - layout.sizePct / 2 - margin)
+            const clampedYPct = clamp(layout.yPct, 0 + layout.sizePct / 2 + margin, 1 - layout.sizePct / 2 - margin)
+            const x = JAR_INSET.left * stageW + clampedXPct * insideW
             const yTop = JAR_INSET.top * stageH
             const yBottom = JAR_INSET.bottom * stageH
-            const y = yBottom - layout.yPct * insideH
+            const y = yBottom - clampedYPct * insideH
             const size = layout.sizePct * stageW
             const isNew = lastAddedId === entry.id
             return (
@@ -95,6 +99,11 @@ export const JarStage: React.FC<Props> = ({ className }) => {
 
         {/* Foreground: tape/art overlay */}
         <img src="/assets/tape-art2.png" alt="Decorative tape" className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain" />
+
+        {/* Optional mask debug (DEV only) */}
+        {import.meta.env.DEV && maskDebugEnabled() && (
+          <MaskDebugOverlay stageW={stageW} stageH={stageH} />
+        )}
 
         {/* Bottom-right CSV download icon */}
         <div className="pointer-events-auto absolute bottom-3 right-3">
@@ -131,12 +140,44 @@ function computeNextPosition(existing: { xPct: number; yPct: number; sizePct: nu
     row = { used: 0, height: rowH }
     rows.push(row)
   }
-  const xPct = row.used + nextSizePct / 2 // center of coin
+  let xPct = row.used + nextSizePct / 2 // center of coin
   row.used += nextSizePct
-  const yPct = (rows.length - 1) * (rowH * (1 - rowGap))
+  let yPct = (rows.length - 1) * (rowH * (1 - rowGap))
   // Normalize y to 0..1 of interior height
-  const yClamped = Math.min(0.98, yPct + nextSizePct / 2)
-  return { xPct, yPct: yClamped }
+  xPct = clamp(xPct, 0 + nextSizePct / 2, 1 - nextSizePct / 2)
+  yPct = clamp(yPct + nextSizePct / 2, 0 + nextSizePct / 2, 1 - nextSizePct / 2)
+  return { xPct, yPct }
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n))
+}
+
+function maskDebugEnabled() {
+  try {
+    const sp = new URLSearchParams(window.location.search)
+    return sp.get('maskDebug') === '1'
+  } catch {
+    return false
+  }
+}
+
+const MaskDebugOverlay: React.FC<{ stageW: number; stageH: number }> = ({ stageW, stageH }) => {
+  const left = JAR_INSET.left * stageW
+  const right = JAR_INSET.right * stageW
+  const top = JAR_INSET.top * stageH
+  const bottom = JAR_INSET.bottom * stageH
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div
+        className="absolute border-2 border-emerald-400/60"
+        style={{ left, top, width: right - left, height: bottom - top }}
+      />
+      <div className="absolute left-2 top-2 rounded bg-black/50 px-2 py-1 text-xs text-emerald-300">
+        maskDebug: interior bounds
+      </div>
+    </div>
+  )
 }
 
 const CSVButton: React.FC = () => {

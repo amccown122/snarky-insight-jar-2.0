@@ -11,7 +11,12 @@ html, body, #root {
 }
 
 body {
-  @apply antialiased bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950;
+  /* Richer layered background with subtle vignette */
+  background:
+    radial-gradient(1200px 600px at 20% 20%, rgba(255,255,255,0.04), rgba(255,255,255,0) 60%),
+    radial-gradient(1200px 700px at 80% 80%, rgba(255,255,255,0.03), rgba(255,255,255,0) 60%),
+    linear-gradient(145deg, #0b0c0e, #0a0b0c 40%, #070809);
+  @apply antialiased text-neutral-100;
 }
 
 .focus-ring:focus-visible {
@@ -41,4 +46,3 @@ body {
   clip: auto !important;
   white-space: normal !important;
 }
-
