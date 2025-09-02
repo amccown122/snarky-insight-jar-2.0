@@ -6,10 +6,10 @@ import Coin from './Coin'
 // Interior bounds of the jar in percentages relative to stage.
 // Initial fit; we will fine-tune after live check.
 const JAR_INSET = {
-  left: 0.265,   // narrowed ~5% from left
-  right: 0.735,  // narrowed ~5% from right
-  top: 0.215,    // moved down ~5%
-  bottom: 0.815, // pulled up ~10%
+  left: 0.290,   // +1% left
+  right: 0.710,  // -1% right
+  top: 0.215,    // unchanged
+  bottom: 0.785, // lowered ~2%
 }
 
 const MIN_SIZE_PCT = 0.052 // ~5.2% of stage width
